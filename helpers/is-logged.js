@@ -1,10 +1,11 @@
 exports.isLoggedIn = () => (req, res, next) => {
   if (req.session.currentUser) {
-    next();
+    console.log('.')
+    next()
   } else {
-    const err = new Error('Unauthorized');
-    err.status = 403;
-    err.statusMessage = 'Unauthorized';
-    next(err);
+    const err = new Error('Unauthorized')
+    err.status = 403
+    err.statusMessage = 'Unauthorized'
+    next(err)
   }
-};
+}
