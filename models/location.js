@@ -1,12 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-const { Schema } = mongoose.Schema;
+const { Schema } = mongoose
 
-const { ObjectId, Decimal128: Double } = mongoose.SchemaTypes;
-
-
-const Place = require('./place');
-const Comment = require('./comment');
+// const Place = require('./place')
+const Comment = require('./comment')
 
 const locationSchema = new Schema({
   id: Number,
@@ -14,23 +11,16 @@ const locationSchema = new Schema({
   address: String,
   category: String,
   location: String,
-  lat: Double,
-  lng: Double,
-  coordinates: {
-    type: 'Point',
-    coordinates: [{
-      longitude: Double,
-      latitude: Double,
-    }],
-  },
+  lat: Number,
+  lng: Number,
   numReviews: Number,
   polarity: Number,
   reviews: String,
   details: String,
   rev: String,
   det: String,
-});
+})
 
-const Location = mongoose.model('Location', locationSchema);
+const Location = mongoose.model('Location', locationSchema)
 
-module.exports = Location;
+module.exports = Location

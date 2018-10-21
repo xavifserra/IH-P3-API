@@ -33,16 +33,19 @@ router.put('/', isLoggedIn(), (req, res, next) => {
       return result.save()
     })
     .then((newUser) => {
+      console.log(newUser)
       req.session.currentUser = newUser
-      res.status(200).json(result)
+      res.status(200).json(newUser)
     })
     .catch(e => res.status(404).json({ error:'not found' }))
 })
 
 router.post('/favorite', isLoggedIn(), (req, res, next) => {
   const { _id: id } = req.session.currentUser
-  const { restaurantId } = req.body
-  res.status(200).json({
+  const { placeId } = req.body
+
+  User.findByIdAndUpdate(id, { favorite:{ $push:{ placeId } } }, { new: true })
+  return res.status(200).json({
     message: 'put favorite',
   })
 
@@ -52,7 +55,9 @@ router.post('/favorite', isLoggedIn(), (req, res, next) => {
   //   - id exists (404)
   // - add to favorites if not there yet
   // - updates user in session
-}).delete('/favorite/:placeId', isLoggedIn(), (req, res, next) => {
+})
+
+router.delete('/favorite/:placeId', isLoggedIn(), (req, res, next) => {
   res.status(200).json({
     message: 'put favorite/:placeId',
   })

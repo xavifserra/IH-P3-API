@@ -13,6 +13,10 @@ const UserSchema = new Schema({
   email: { type: String, unique: true, required: true },
   name: String,
   lastName: String,
+  languages: {
+    type: String,
+    enum: ['en', 'it', 'fr', 'nl', 'de', 'es' ],
+    default: 'es' },
   favorites: [{ type: ObjectId, ref: 'Restaurant' }],
   comments: [{ type: ObjectId, ref: 'Comment' }],
   following: [{ type: ObjectId, ref: 'User' }],
@@ -23,7 +27,7 @@ const UserSchema = new Schema({
   },
 })
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', function (next)  {
   var user = this
 
   if (!user.isModified('password')) return next()

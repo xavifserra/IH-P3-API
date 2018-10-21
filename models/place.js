@@ -1,76 +1,44 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-const { Schema } = mongoose.Schema;
-
-const { ObjectId, Decimal128: Double } = mongoose.SchemaTypes;
+const { Schema } = mongoose
+const { ObjectId, Decimal128: Double } = mongoose.SchemaTypes
 
 const placeSchema = new Schema({
-  id: Number,
+  id: { type: Number, unique: true },
   name: String,
   address: String,
   category: String,
   location: String,
-  lat: Double,
-  lng: Double,
-  coordinates: {
-    type: 'Point',
-    coordinates: [{
-      longitude: Double,
-      latitude: Double,
-    }],
-  },
-  services: {
-    en: [String],
-    it: [String],
-    fr: [String],
-    nl: [String],
-    de: [String],
-    es: [String],
-  },
-  phone_number: String,
-  international_phone_number: String,
-  website: String,
-  icon: String,
-  description: {
-    en: String,
-    it: String,
-    fr: String,
-    nl: String,
-    de: String,
-    es: String,
-    unidentified: String,
-  },
-  external_urls: {
-    Foursquare: String,
-    Facebook: String,
-    GooglePlaces: String,
-    Booking: String,
-  },
-  statistics: {
-    Foursquare: {
-      checkinsCount: Number,
-      usersCount: Number,
-      tipCount: Number,
-      price: Number,
-      likes: Number,
-      hereNow: {
-        count: Number,
-        summary: Number,
-        groups: [Number],
-      },
-    },
-    Facebook: {
-      checkins: Number,
-      talking_about_count: Number,
-      were_here_count: Number,
-      fan_count: Number,
-    },
-  },
   numReviews: Number,
-  reviews: [String],
   polarity: Number,
-});
+  reviews: String,
+  details: String,
+  lat: Number,
+  lng: Number,
+  // geo: {
+  //   type: { type: String, index: true },
+  //   coordinates: { type: [Number], index: '2dsphere' },
+  // },
+  geoLocation: {
+    type: { type: String },
+    coordinates: [Number],
+  },
+})
 
-const Place = mongoose.model('Place', placeSchema);
+placeSchema.index({ geoLocation: '2dsphere' })
 
-module.exports = Place;
+// placeSchema.pre('save',  (next) => {
+//   const value = this.get('geo')
+
+//   if (value === null) return next()
+//   if (value === undefined) return next()
+//   if (!Array.isArray(value)) return next(new Error('Coordinates must be an array'))
+//   if (value.length === 0) return this.set(path, undefined)
+//   if (value.length !== 2) return next(new Error('Coordinates should be of length 2'))
+
+//   next()
+// })
+
+const Place = mongoose.model('Place', placeSchema)
+
+module.exports = Place

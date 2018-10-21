@@ -5,12 +5,12 @@ const  { ObjectId }  = mongoose.SchemaTypes;
 
 const commentSchema = new Schema({
   id: Number,
-  language: String,
-  polarity: Number,
-  rating: Number,
-  source: String,
   text: String,
+  language: String,
+  rating: Number,
+  polarity: Number,
   time: Date,
+  source: String,
   wordsCount: Number,
   details: String
   },
