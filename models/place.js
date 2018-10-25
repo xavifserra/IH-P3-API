@@ -28,7 +28,7 @@ const placeSchema = new Schema({
 placeSchema.index({ geoLocation: '2dsphere' })
 
 // placeSchema.pre('save',  (next) => {
-//   const value = this.get('geo')
+//   const value = this.get('geoLocation')
 
 //   if (value === null) return next()
 //   if (value === undefined) return next()

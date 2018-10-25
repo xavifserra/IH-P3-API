@@ -38,6 +38,7 @@ router.post('/', isLoggedIn(), (req, res, next) => {
     })
   }
 })
+
 // isLoggedIn(),
 router.get('/around',  (req, res, next) => {
   const { lat, lng, dist } = req.query
@@ -52,5 +53,36 @@ router.get('/around',  (req, res, next) => {
       : res.status(200).json({ documents: response.length, data: response })))
 })
 
+router.get('/aroundGeoJSON',  (req, res, next) => {
+  const { lat, lng, dist } = req.query
+  console.log(req.query)
+  const centerPoint = { type: 'Point', coordinates:[lng, lat]  }
+  console.log(centerPoint)
+  // Places.near({center: {coordinates: [latitude, longitude], type: 'Point'}, maxDistance: maxDistance})
+
+  Places.find({ geoLocation:{ $near:{ $geometry: centerPoint, $maxDistance:dist } } })// , { geoLocation:1 })
+    .find((error, response) => {
+      const responseGeoJSON = {
+        type:'FeatureCollection',
+        features:[],
+      }
+
+      if (error) return res.status(500).json({ message:error })
+
+      response.forEach((element) => {
+        responseGeoJSON.features.push({
+          type:'Marker',
+          properties:{
+            place: element.name,
+            polarity: `${element.polarity}`,
+            lat: `${element.lat}`,
+            lon: `${element.lng}`,
+          },
+          geometry: element.geoLocation,
+        })
+      })
+      return res.status(200).json(responseGeoJSON)
+    })
+})
 
 module.exports = router
