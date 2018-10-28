@@ -17,7 +17,7 @@ const UserSchema = new Schema({
     type: String,
     enum: ['en', 'it', 'fr', 'nl', 'de', 'es' ],
     default: 'es' },
-  favorites: [{ type: ObjectId, ref: 'Restaurant' }],
+  favorites: [{ type: ObjectId, ref: 'Place' }],
   comments: [{ type: ObjectId, ref: 'Comment' }],
   following: [{ type: ObjectId, ref: 'User' }],
 }, {
@@ -28,7 +28,7 @@ const UserSchema = new Schema({
 })
 
 UserSchema.pre('save', function (next)  {
-  var user = this
+  const user = this
 
   if (!user.isModified('password')) return next()
 
@@ -37,7 +37,7 @@ UserSchema.pre('save', function (next)  {
     if (err) return next(err)
     bcrypt.hash(user.password, salt, (err, hash) => {
       if (err) return next(err)
-      console.log({ pwd: user.password, hash })
+      // console.log({ pwd: user.password, hash })
       user.password = hash
       next()
     })

@@ -17,7 +17,8 @@ router.get('/', (req, res, next) => {
   })
 })
 
-// TODO proteger  isLoggedIn() y isOwner?
+// TODO: proteger  isLoggedIn() y isOwner?
+// CRUD Read
 router.get('/:id([0-9]+)', (req, res, next) => {
   const { id } = req.params
 
@@ -26,17 +27,21 @@ router.get('/:id([0-9]+)', (req, res, next) => {
     return res.status(200).json({ documents: response.length, data: response })
   })
 })
-
+// CRUD Create
 router.post('/', isLoggedIn(), (req, res, next) => {
-  console.log('POST api/v1/places')
-  const { id } = req.body
-  if (req.session.currentUser) {
-    res.json('places/new')
-  } else {
-    res.status(404).json({
-      error: 'not-found',
-    })
-  }
+  res.status(200).json(req.body)
+})
+
+// CRUD Update
+router.put('/', isLoggedIn(), (req, res, next) => {
+  const { id } = req.params
+  res.status(200).json({ id, body: req.body })
+})
+
+// CRUD Delete
+router.delete('/', isLoggedIn(), (req, res, next) => {
+  const { id } = req.params
+  res.status(200).json({ id, body: req.body })
 })
 
 // isLoggedIn(),
@@ -53,6 +58,7 @@ router.get('/around',  (req, res, next) => {
       : res.status(200).json({ documents: response.length, data: response })))
 })
 
+// isLoggedIn(),
 router.get('/aroundGeoJSON',  (req, res, next) => {
   const { lat, lng, dist } = req.query
   console.log(req.query)
@@ -73,14 +79,22 @@ router.get('/aroundGeoJSON',  (req, res, next) => {
         responseGeoJSON.features.push({
           type:'Marker',
           properties:{
+            id: element.id,
             place: element.name,
+            address: element.address,
+            category: element.category,
+            location: element.location,
+            numReviews: element.numReviews,
+            reviews: element.reviews,
+            details: element.details,
             polarity: `${element.polarity}`,
             lat: `${element.lat}`,
-            lon: `${element.lng}`,
+            lng: `${element.lng}`,
           },
           geometry: element.geoLocation,
         })
       })
+      console.log({ items:responseGeoJSON.features.length });
       return res.status(200).json(responseGeoJSON)
     })
 })

@@ -23,6 +23,30 @@ const placeSchema = new Schema({
     type: { type: String },
     coordinates: [Number],
   },
+  // numComments: Number,
+  // comments: [
+  //   {
+  //     id: Number,
+  //     text: String,
+  //     language: String,
+  //     rating: Number,
+  //     time: { type:Date, defaul: Date.now() },
+  //     airConditioned: boolean,
+  //     clean: boolean,
+  //     smells: boolean,
+  //     quiet: boolean,
+  //     suplements: boolean,
+  //     fidelityCard: boolean,
+  //     ticketRestaurant: boolean,
+  //     chequeGourmet: boolean,
+  //     bright: boolean,
+  //     wifi: boolean,
+  //     movileCoberage: boolean,
+  //     postedBy: { type:ObjectId, ref:'User' },
+  //     place: { type: ObjectId, ref:'Place' },
+  //     details: String,
+  //   },
+  // ],
 })
 
 placeSchema.index({ geoLocation: '2dsphere' })
