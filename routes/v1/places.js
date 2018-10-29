@@ -3,12 +3,12 @@ const express = require('express')
 const router = express.Router()
 const Places = require('../../models/place')
 const { isLoggedIn } = require('../../helpers/is-logged')
-const {getDistanceBetweenTwoPointsInKm} = require('../../helpers/distances')
+const { getDistanceBetweenTwoPointsInKm } = require('../../helpers/distances')
 
 // TODO: proteger  isLoggedIn()
 
 // return all places or optional find params.
-router.get('/', (req, res, next) => {
+router.get('/', isLoggedIn(), (req, res, next) => {
   const { offset, qtty } = req.query
   console.log(offset, qtty)
 
@@ -20,33 +20,106 @@ router.get('/', (req, res, next) => {
 
 // TODO: proteger  isLoggedIn() y isOwner?
 // CRUD Read
-router.get('/:id([0-9]+)', (req, res, next) => {
+router.get('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
   const { id } = req.params
 
   Places.findById(id, (err, response) => {
+    const documents = response ? response.length : 0
+
     if (err) return res.status(404).json({ error:err })
-    return res.status(200).json({ documents: response.length, data: response })
+
+    return res.status(200).json({ documents, data: response })
   })
 })
+
 // CRUD Create
 router.post('/', isLoggedIn(), (req, res, next) => {
-  res.status(200).json(req.body)
+  const {
+    id,
+    name,
+    address,
+    category,
+    location,
+    lat,
+    lng,
+  } = req.body
+
+  Places.create({
+    id,
+    name,
+    address,
+    category,
+    location,
+    lat:parseFloat(lat),
+    lng:parseFloat(lng),
+    geoLocation:{
+      type : 'Point',
+      coordinates : [lng, lat],
+    },
+  })
+    .then((element) => {
+      res.status(200).json(element)
+    })
+    .catch((error) => {
+      res.status(500).json({ error })
+    })
 })
 
 // CRUD Update
 router.put('/', isLoggedIn(), (req, res, next) => {
-  const { id } = req.params
-  res.status(200).json({ id, body: req.body })
+  const {
+    _id,
+    id,
+    name,
+    address,
+    category,
+    location,
+    lat,
+    lng,
+  } = req.body
+
+  Places.findById({ _id })
+    .then((element) => {
+      console.log(element);
+      if (element) {
+        element.id = id
+        element.name = name
+        element.address = address
+        element.category = category
+        element.location = location
+        element.lat = lat
+        element.lng = lng
+        geoLocation = {
+          type : 'Point',
+          coordinates : [lng, lat],
+        }
+        return element.save()
+      }
+    })
+    .then((updatedElement) => {
+      console.log(updatedElement)
+      res.status(200).json(updatedElement)
+    })
+    .catch((error) => {
+      res.status(500).json({ error })
+    })
 })
 
 // CRUD Delete
-router.delete('/', isLoggedIn(), (req, res, next) => {
-  const { id } = req.params
-  res.status(200).json({ id, body: req.body })
+router.delete('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
+  const { id:_id } = req.params
+  Places.deleteOne({ _id })
+    .then((element) => {
+      res.status(200).json(element)
+    })
+    .catch((error) => {
+      res.status(404).json({ message:error })
+    })
 })
 
 // isLoggedIn(),
-router.get('/around',  (req, res, next) => {
+
+router.get('/around', isLoggedIn(), (req, res, next) => {
   const { lat, lng, dist } = req.query
   console.log(req.query)
   const centerPoint = { type: 'Point', coordinates:[lng, lat]  }
@@ -60,7 +133,7 @@ router.get('/around',  (req, res, next) => {
 })
 
 // isLoggedIn(),
-router.get('/aroundGeoJSON',  (req, res, next) => {
+router.get('/aroundGeoJSON', isLoggedIn(), (req, res, next) => {
   const { lat, lng, dist } = req.query
   console.log(req.query)
   const centerPoint = { type: 'Point', coordinates:[lng, lat]  }

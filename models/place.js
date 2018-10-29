@@ -15,50 +15,32 @@ const placeSchema = new Schema({
   details: String,
   lat: Number,
   lng: Number,
-  // geo: {
-  //   type: { type: String, index: true },
-  //   coordinates: { type: [Number], index: '2dsphere' },
-  // },
   geoLocation: {
     type: { type: String },
     coordinates: [Number],
   },
-  // numComments: Number,
-  // comments: [
-  //   {
-  //     id: Number,
-  //     text: String,
-  //     language: String,
-  //     rating: Number,
-  //     time: { type:Date, defaul: Date.now() },
-  //     airConditioned: boolean,
-  //     clean: boolean,
-  //     smells: boolean,
-  //     quiet: boolean,
-  //     suplements: boolean,
-  //     fidelityCard: boolean,
-  //     ticketRestaurant: boolean,
-  //     chequeGourmet: boolean,
-  //     bright: boolean,
-  //     wifi: boolean,
-  //     movileCoberage: boolean,
-  //     postedBy: { type:ObjectId, ref:'User' },
-  //     place: { type: ObjectId, ref:'Place' },
-  //     details: String,
-  //   },
-  // ],
 })
 
 placeSchema.index({ geoLocation: '2dsphere' })
 
 // placeSchema.pre('save',  (next) => {
-//   const value = this.get('geoLocation')
+//   const valueGeoLocation = this.get('geoLocation')
+//   const valueLat = this.get('lat')
+//   const valueLng = this.get('lng')
 
-//   if (value === null) return next()
-//   if (value === undefined) return next()
-//   if (!Array.isArray(value)) return next(new Error('Coordinates must be an array'))
-//   if (value.length === 0) return this.set(path, undefined)
-//   if (value.length !== 2) return next(new Error('Coordinates should be of length 2'))
+//   console.log({ valueLat, valueLng })
+
+//   if (!valueLat || !valueLng) return next()
+//   if (valueGeoLocation === null || valueGeoLocation === undefined) {
+//     valueGeoLocation.type = 'Point'
+//     valueGeoLocation.coordinates = [valueLat, valueLng]
+//     console.log({ valueGeoLocation })
+//     return next()
+//   }
+//   if (valueGeoLocation === undefined) return next()
+//   if (!Array.isArray(valueGeoLocation)) return next(new Error('Coordinates must be an array'))
+//   // if (valueGeoLocation.length === 0) return this.set(path, undefined)
+//   if (valueGeoLocation.length !== 2) return next(new Error('Coordinates should be of length 2'))
 
 //   next()
 // })

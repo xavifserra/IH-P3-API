@@ -20,7 +20,7 @@ const commentSchema = new Schema(
     chequeGourmet: Boolean,
     bright: Boolean,
     wifi: Boolean,
-    movileCoberage: Boolean,
+    movileCoverage: Boolean,
     postedBy: { type: ObjectId, ref: 'User' },
     placeId: { type: ObjectId, ref: 'Place' },
     details: String,
