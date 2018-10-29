@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 const Places = require('../../models/place')
 const { isLoggedIn } = require('../../helpers/is-logged')
+const {getDistanceBetweenTwoPointsInKm} = require('../../helpers/distances')
 
 // TODO: proteger  isLoggedIn()
 
@@ -79,6 +80,7 @@ router.get('/aroundGeoJSON',  (req, res, next) => {
         responseGeoJSON.features.push({
           type:'Marker',
           properties:{
+            _id: element._id,
             id: element.id,
             place: element.name,
             address: element.address,
@@ -90,11 +92,12 @@ router.get('/aroundGeoJSON',  (req, res, next) => {
             polarity: `${element.polarity}`,
             lat: `${element.lat}`,
             lng: `${element.lng}`,
+            distance:getDistanceBetweenTwoPointsInKm(lat, lng, element.lat, element.lng),
           },
           geometry: element.geoLocation,
         })
       })
-      console.log({ items:responseGeoJSON.features.length });
+      console.log({ items:responseGeoJSON.features.length })
       return res.status(200).json(responseGeoJSON)
     })
 })
