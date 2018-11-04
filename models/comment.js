@@ -1,14 +1,16 @@
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema;
+
+const { Schema } = mongoose
 
 const  { ObjectId }  = mongoose.SchemaTypes
 
 const commentSchema = new Schema(
   {
-    id: Number,
-    text: String,
-    language: String,
-    rating: Number,
+    postedBy: { type: ObjectId, ref: 'User' },
+    //placeId: { type: ObjectId, ref: 'Place' },
+    details: String,
+    language: { type:String, default:'en' },
+    rating: { type:Number, min:0, max:5 },
     time: { type:Date, default: Date.now },
     airConditioned: Boolean,
     clean: Boolean,
@@ -21,9 +23,6 @@ const commentSchema = new Schema(
     bright: Boolean,
     wifi: Boolean,
     movileCoverage: Boolean,
-    postedBy: { type: ObjectId, ref: 'User' },
-    placeId: { type: ObjectId, ref: 'Place' },
-    details: String,
   },
 )
 

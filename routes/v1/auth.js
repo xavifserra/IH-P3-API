@@ -20,7 +20,7 @@ router.get('/me', (req, res, next) => {
 router.post('/login', (req, res, next) => {
   if (req.session.currentUser) {
     return res.status(401).json({
-      error: 'unautorized. session active, first logout',
+      error: 'Unautorized. Session active, first logout',
     })
   }
 

@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 // const Place = require('./place')
-const Comment = require('./comment')
+const Comment = require('../comment')
 
 const locationSchema = new Schema({
   id: Number,

@@ -29,7 +29,7 @@ router.get('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
     if (err) return res.status(404).json({ error:err })
 
     return res.status(200).json({ documents, data: response })
-  })
+  }).populate('comments')
 })
 
 // CRUD Create
@@ -80,7 +80,7 @@ router.put('/', isLoggedIn(), (req, res, next) => {
 
   Places.findById({ _id })
     .then((element) => {
-      console.log(element);
+      // console.log(element)
       if (element) {
         element.id = id
         element.name = name
@@ -95,9 +95,9 @@ router.put('/', isLoggedIn(), (req, res, next) => {
         }
         return element.save()
       }
-    })
+    }).populate('comments')
     .then((updatedElement) => {
-      console.log(updatedElement)
+      // console.log(updatedElement)
       res.status(200).json(updatedElement)
     })
     .catch((error) => {
@@ -117,8 +117,6 @@ router.delete('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
     })
 })
 
-// isLoggedIn(),
-
 router.get('/around', isLoggedIn(), (req, res, next) => {
   const { lat, lng, dist } = req.query
   console.log(req.query)
@@ -132,7 +130,6 @@ router.get('/around', isLoggedIn(), (req, res, next) => {
       : res.status(200).json({ documents: response.length, data: response })))
 })
 
-// isLoggedIn(),
 router.get('/aroundGeoJSON', isLoggedIn(), (req, res, next) => {
   const { lat, lng, dist } = req.query
   console.log(req.query)
@@ -172,7 +169,7 @@ router.get('/aroundGeoJSON', isLoggedIn(), (req, res, next) => {
       })
       console.log({ items:responseGeoJSON.features.length })
       return res.status(200).json(responseGeoJSON)
-    })
+    }).populate('comments')
 })
 
 module.exports = router

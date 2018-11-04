@@ -1,5 +1,4 @@
 const express = require('express')
-const bcrypt = require('bcrypt')
 
 const router = express.Router()
 
@@ -9,15 +8,14 @@ const Comment = require('../../models/comment')
 
 const { isLoggedIn } = require('../../helpers/is-logged')
 
+// CRUD
 router.get('/', isLoggedIn(), (req, res, next) => {
   const { _id: id } = req.session.currentUser
 
   User.findById(id)
     .then(result => res.status(200).json(result))
     .catch(e => res.status(404).json('not found'))
-})
-
-router.put('/', isLoggedIn(), (req, res, next) => {
+}).put('/', isLoggedIn(), (req, res, next) => {
   const { _id : id } = req.session.currentUser
   const {
     username, password, email, name, lastname,
@@ -38,51 +36,96 @@ router.put('/', isLoggedIn(), (req, res, next) => {
       res.status(200).json(newUser)
     })
     .catch(e => res.status(404).json({ error:'not found' }))
+}).delete('/', isLoggedIn(),  (req, res, next) => {
+  const { _id : id } = req.session.currentUser
+
+  User.findByIdAndDelete(id)
+    .then(deletedUser => res.status(200).json({ deletedUser }))
+    .catch(e => res.status(404).json({ error:'not found' }))
 })
 
-router.post('/favorite', isLoggedIn(), (req, res, next) => {
+// FAVORITES
+router.put('/favorite/:placeId([a-z,0-9]{24})', (req, res, next) => {
+  const { _id:id } = req.session.currentUser
+  const { placeId } = req.params
+
+  console.log({ id })
+  console.log(placeId)
+
+  User.findByIdAndUpdate(id, { $push: { favorites: placeId } }, { new: true })
+    .then((element) => {
+      console.log(element)
+      res.status(200).json({ element })
+    })
+    .catch(e => res.status(404).json({ error:'not found' }))
+}).delete('/favorite/:placeId([a-z,0-9]{24})', (req, res, next) => {
   const { _id: id } = req.session.currentUser
-  const { placeId } = req.body
+  const { placeId } = req.params
 
-  User.findByIdAndUpdate(id, { favorite:{ $push:{ placeId } } }, { new: true })
-  return res.status(200).json({
-    message: 'put favorite',
-  })
-
-  // - body:
-  // - validation
-  //   - id not valid (404)
-  //   - id exists (404)
-  // - add to favorites if not there yet
-  // - updates user in session
+  User.findByIdAndUpdate(id, { $pull: { favorites:placeId } }, { new: true })
+    .then(element => res.status(200).json(element))
+    .catch(e => res.status(404).json({ error:'not found' }))
 })
 
-router.delete('/favorite/:placeId', isLoggedIn(), (req, res, next) => {
-  res.status(200).json({
-    message: 'put favorite/:placeId',
-  })
-  // - validation
-  //   - id is valid (404)
-  //   - id not exists (404)
-  // - body: (empty - the user is already stored in the session)
-  // - remove from favorites
-  // - updates user in session
-})
+// REVIEWS
+router.post('/comment/:placeId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
+  const { _id: postedBy } = req.session.currentUser
+  const { placeId: id } = req.params
+  const {
+    language,
+    rating,
+    clean,
+    smells,
+    quiet,
+    bright,
+    airConditioned,
+    suplements,
+    fidelityCard,
+    ticketRestaurant,
+    chequeGourmet,
+    wifi,
+    movileCoverage,
+    details,
+  } = req.body
 
-router.post('/comment/:placeId', isLoggedIn(), (req, res, next) => {
-  const { id } = req.params
-  res.status(200).json({
-    message: `delete comment/${id}`,
-    // - validation
-    //  - id is valid (404)
-    //  - id not exists (404)
-    //  - body: (empty - the user is already stored in the session)
+  Comment.create({
+    postedBy,
+    language,
+    details,
+    rating,
+    clean,
+    smells,
+    quiet,
+    bright,
+    airConditioned,
+    suplements,
+    fidelityCard,
+    ticketRestaurant,
+    chequeGourmet,
+    wifi,
+    movileCoverage,
   })
-}).delete('/comment/:placeId/:commentId', isLoggedIn(), (req, res, next) => {
-  res.status(200).json({
-    message: `delete /me/comment//${id}`,
+    .then((element) => {
+      console.log(id)
+      console.log(element._id)
+      const comments = element._id
 
-  })
+      return Place.findByIdAndUpdate(id, { $push: { comments } }, { new:true }).populate('comments')
+    })
+    .then(element => res.status(200).json(element))
+    .catch(e => res.status(404).json({ error:'not found' }))
+}).delete('/comment/:placeId([a-z,0-9]{24})/:commentId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
+  const { commentId:id, placeId } = req.params
+
+  Comment.findByIdAndRemove(id)
+    .then((element) => {
+      console.log(id)
+      console.log(element._id)
+
+      return Place.findByIdAndUpdate({ _id:placeId }, { $pull: { comments:id } }, { new:true }).populate('comments')
+    })
+    .then(element => res.status(200).json(element))
+    .catch(e => res.status(404).json({ error:'not found' }))
 })
 
 

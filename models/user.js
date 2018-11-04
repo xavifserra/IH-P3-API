@@ -16,7 +16,7 @@ const UserSchema = new Schema({
   languages: {
     type: String,
     enum: ['en', 'it', 'fr', 'nl', 'de', 'es' ],
-    default: 'es' },
+    default: 'en' },
   favorites: [{ type: ObjectId, ref: 'Place' }],
   comments: [{ type: ObjectId, ref: 'Comment' }],
   following: [{ type: ObjectId, ref: 'User' }],

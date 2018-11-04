@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
 
 const { Schema } = mongoose
-const { ObjectId, Decimal128: Double } = mongoose.SchemaTypes
+
+const { ObjectId } = mongoose.SchemaTypes
 
 const placeSchema = new Schema({
   id: { type: Number, unique: true },
@@ -19,6 +20,7 @@ const placeSchema = new Schema({
     type: { type: String },
     coordinates: [Number],
   },
+  comments: [{ type: ObjectId, ref: 'Comment' }],
 })
 
 placeSchema.index({ geoLocation: '2dsphere' })
