@@ -21,6 +21,16 @@ const placeSchema = new Schema({
     coordinates: [Number],
   },
   comments: [{ type: ObjectId, ref: 'Comment' }],
+  services: {
+    airConditioned: Boolean,
+    fidelityCard: Boolean,
+    ticketRestaurant: Boolean,
+    chequeGourmet: Boolean,
+    wifi: Boolean,
+    movileCoverage: Boolean,
+    pets: Boolean,
+    adapted: Boolean,
+  },
 })
 
 placeSchema.index({ geoLocation: '2dsphere' })

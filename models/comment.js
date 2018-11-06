@@ -11,7 +11,7 @@ const commentSchema = new Schema(
     details: String,
     language: { type:String, default:'en' },
     rating: { type:Number, min:0, max:5 },
-    time: { type:Date, default: Date.now },
+    timeStamp: { type:Date, default: Date.now },
     airConditioned: Boolean,
     clean: Boolean,
     smells: Boolean,
