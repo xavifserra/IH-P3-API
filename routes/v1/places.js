@@ -130,7 +130,7 @@ router.get('/around', isLoggedIn(), (req, res, next) => {
       : res.status(200).json({ documents: response.length, data: response })))
 })
 
-router.get('/aroundGeoJSON', isLoggedIn(), (req, res, next) => {
+router.get('/aroundGeoJSON', (req, res, next) => {
   const { lat, lng, dist } = req.query
   console.log(req.query)
   const centerPoint = { type: 'Point', coordinates:[lng, lat]  }
