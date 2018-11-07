@@ -21,6 +21,7 @@ const placeSchema = new Schema({
     coordinates: [Number],
   },
   comments: [{ type: ObjectId, ref: 'Comment' }],
+  owner: { type: ObjectId, ref: 'User' },
   services: {
     airConditioned: Boolean,
     fidelityCard: Boolean,

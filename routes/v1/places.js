@@ -32,8 +32,8 @@ router.get('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
   }).populate('comments')
 })
 
-// CRUD Create
-router.post('/', isLoggedIn(), (req, res, next) => {
+// CRUD Create  isLoggedIn(),
+router.post('/', (req, res, next) => {
   const {
     id,
     name,
@@ -42,6 +42,14 @@ router.post('/', isLoggedIn(), (req, res, next) => {
     location,
     lat,
     lng,
+    airConditioned,
+    fidelityCard,
+    ticketRestaurant,
+    chequeGourmet,
+    wifi,
+    movileCoverage,
+    pets,
+    adapted,
   } = req.body
 
   Places.create({
@@ -56,6 +64,16 @@ router.post('/', isLoggedIn(), (req, res, next) => {
       type : 'Point',
       coordinates : [lng, lat],
     },
+    services: {
+      airConditioned,
+      fidelityCard,
+      ticketRestaurant,
+      chequeGourmet,
+      wifi,
+      movileCoverage,
+      pets,
+      adapted,
+    }
   })
     .then((element) => {
       res.status(200).json(element)
@@ -76,6 +94,14 @@ router.put('/', isLoggedIn(), (req, res, next) => {
     location,
     lat,
     lng,
+    airConditioned,
+    fidelityCard,
+    ticketRestaurant,
+    chequeGourmet,
+    wifi,
+    movileCoverage,
+    pets,
+    adapted,
   } = req.body
 
   Places.findById({ _id })
@@ -93,7 +119,17 @@ router.put('/', isLoggedIn(), (req, res, next) => {
           type : 'Point',
           coordinates : [lng, lat],
         }
-        return element.save()
+        element.services = {
+          airConditioned,
+          fidelityCard,
+          ticketRestaurant,
+          chequeGourmet,
+          wifi,
+          movileCoverage,
+          pets,
+          adapted,
+        }
+        element.save()
       }
     }).populate('comments')
     .then((updatedElement) => {
@@ -129,15 +165,17 @@ router.get('/around', isLoggedIn(), (req, res, next) => {
       ? res.status(500).json({ message:error })
       : res.status(200).json({ documents: response.length, data: response })))
 })
-
+// not protected
 router.get('/aroundGeoJSON', (req, res, next) => {
   const { lat, lng, dist } = req.query
-  console.log(req.query)
+  // console.log(req.query)
   const centerPoint = { type: 'Point', coordinates:[lng, lat]  }
-  console.log(centerPoint)
+  // console.log(centerPoint)
   // Places.near({center: {coordinates: [latitude, longitude], type: 'Point'}, maxDistance: maxDistance})
 
   Places.find({ geoLocation:{ $near:{ $geometry: centerPoint, $maxDistance:dist } } })// , { geoLocation:1 })
+    .populate('comments')
+    .populate('owner')
     .find((error, response) => {
       const responseGeoJSON = {
         type:'FeatureCollection',
@@ -165,11 +203,14 @@ router.get('/aroundGeoJSON', (req, res, next) => {
             distance:getDistanceBetweenTwoPointsInKm(lat, lng, element.lat, element.lng),
           },
           geometry: element.geoLocation,
+          services : element.services,
+          owner: element.owner,
+          comments: element.comments,
         })
       })
       console.log({ items:responseGeoJSON.features.length })
       return res.status(200).json(responseGeoJSON)
-    }).populate('comments')
+    })
 })
 
 module.exports = router
