@@ -73,7 +73,7 @@ router.post('/', (req, res, next) => {
       movileCoverage,
       pets,
       adapted,
-    }
+    },
   })
     .then((element) => {
       res.status(200).json(element)
