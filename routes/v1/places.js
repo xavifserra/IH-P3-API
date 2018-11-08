@@ -201,11 +201,11 @@ router.get('/aroundGeoJSON', (req, res, next) => {
             lat: `${element.lat}`,
             lng: `${element.lng}`,
             distance:getDistanceBetweenTwoPointsInKm(lat, lng, element.lat, element.lng),
+            services : element.services,
+            owner: element.owner,
+            comments: element.comments,
           },
           geometry: element.geoLocation,
-          services : element.services,
-          owner: element.owner,
-          comments: element.comments,
         })
       })
       console.log({ items:responseGeoJSON.features.length })
