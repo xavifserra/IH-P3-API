@@ -13,7 +13,10 @@ router.get('/', isLoggedIn(), (req, res, next) => {
   const { _id: id } = req.session.currentUser
 
   User.findById(id)
-    .then(result => res.status(200).json(result))
+    .populate('favorites')
+    .populate('comments')
+    .populate('following')
+    .then(user => res.status(200).json(user))
     .catch(e => res.status(404).json('not found'))
 }).put('/', isLoggedIn(), (req, res, next) => {
   const { _id : id } = req.session.currentUser
@@ -53,9 +56,9 @@ router.put('/favorite/:placeId([a-z,0-9]{24})', (req, res, next) => {
   console.log(placeId)
 
   User.findByIdAndUpdate(id, { $push: { favorites: placeId } }, { new: true })
-    .then((element) => {
-      console.log(element)
-      res.status(200).json({ element })
+    .then((updatedUser) => {
+      console.log(updatedUser)
+      res.status(200).json({ updatedUser })
     })
     .catch(e => res.status(404).json({ error:'not found' }))
 }).delete('/favorite/:placeId([a-z,0-9]{24})', (req, res, next) => {
@@ -63,7 +66,10 @@ router.put('/favorite/:placeId([a-z,0-9]{24})', (req, res, next) => {
   const { placeId } = req.params
 
   User.findByIdAndUpdate(id, { $pull: { favorites:placeId } }, { new: true })
-    .then(element => res.status(200).json(element))
+    .then((updatedUser) => {
+      console.log(updatedUser)
+      res.status(200).json({ updatedUser })
+    })
     .catch(e => res.status(404).json({ error:'not found' }))
 })
 

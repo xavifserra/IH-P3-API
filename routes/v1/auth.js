@@ -7,7 +7,8 @@ const User = require('../../models/user')
 const { isLoggedIn } = require('../../helpers/is-logged')
 
 router.get('/me', (req, res, next) => {
-  // console.log('me', req.session.currentUser)
+  console.log('me', req.session.currentUser)
+
   if (req.session.currentUser) {
     res.status(200).json(req.session.currentUser)
   } else {
@@ -39,7 +40,7 @@ router.post('/login', (req, res, next) => {
         .then((value) => {
           console.log(value)
           req.session.currentUser = user
-          res.status(200).json(user)
+          return res.status(200).json(user)
         })
         // .catch(e => res.status(404).json({ error: 'not-found' }))
     })
