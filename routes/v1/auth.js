@@ -18,6 +18,7 @@ router.get('/me', (req, res, next) => {
   }
 })
 
+// eslint-disable-next-line consistent-return
 router.post('/login', (req, res, next) => {
   if (req.session.currentUser) {
     return res.status(401).json({
@@ -31,6 +32,9 @@ router.post('/login', (req, res, next) => {
     return res.status(422).json({ error: 'validation' })
   }
   User.findOne({ username })
+    .populate('favorites')
+    .populate('comments')
+    .populate('following')
     .then((user) => {
       console.log(user)
       if (!user) {
@@ -47,6 +51,7 @@ router.post('/login', (req, res, next) => {
     .catch(next)
 })
 
+// eslint-disable-next-line consistent-return
 router.post('/signup', (req, res, next) => {
   const {
     username,
@@ -60,6 +65,8 @@ router.post('/signup', (req, res, next) => {
   }
 
   User.findOne({ username }, 'username')
+
+    // eslint-disable-next-line consistent-return
     .then((userExists) => {
       if (userExists) {
         return res.status(400).json({ error: 'username-not-unique' })
@@ -68,7 +75,6 @@ router.post('/signup', (req, res, next) => {
       // const salt = bcrypt.genSaltSync(10)
       // const hashPass = bcrypt.hashSync(password, salt)
 
-      console.log('userNotExist')
       User.create({
         username,
         password, // : hashPass,
@@ -76,7 +82,7 @@ router.post('/signup', (req, res, next) => {
       }).then((newUser) => {
         console.log(newUser)
         req.session.currentUser = newUser
-        res.status(200).json(newUser)
+        return res.status(200).json(newUser)
       }).catch(next)
     })
     .catch(next)

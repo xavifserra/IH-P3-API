@@ -25,6 +25,9 @@ router.get('/', isLoggedIn(), (req, res, next) => {
   } = req.body
 
   User.findById(id)
+    .populate('favorites')
+    .populate('comments')
+    .populate('following')
     .then((result) => {
       result.username = username
       result.password = password
@@ -43,34 +46,85 @@ router.get('/', isLoggedIn(), (req, res, next) => {
   const { _id : id } = req.session.currentUser
 
   User.findByIdAndDelete(id)
+    .populate('favorites')
+    .populate('comments')
+    .populate('following')
     .then(deletedUser => res.status(200).json({ deletedUser }))
     .catch(e => res.status(404).json({ error:'not found' }))
 })
 
 // FAVORITES
-router.put('/favorite/:placeId([a-z,0-9]{24})', (req, res, next) => {
+router.get('/favorites', (req, res, next) => { // not Used, returned value in user poulated
+  const { _id:id } = req.session.currentUser
+  const { placeId } = req.params
+  const responseGeoJSON = {
+    type:'FeatureCollection',
+    features:[],
+  }
+  // console.log({ id })
+  // console.log(placeId)
+
+  User.findById(id)
+    .populate('favorites')
+    .then((populatedUser) => {
+      console.log(populatedUser)
+      populatedUser.favorites.forEach((element) => {
+        responseGeoJSON.features.push({
+          type:'Marker',
+          properties:{
+            _id: element._id,
+            id: element.id,
+            place: element.name,
+            address: element.address,
+            category: element.category,
+            location: element.location,
+            numReviews: element.numReviews,
+            reviews: element.reviews,
+            details: element.details,
+            polarity: `${element.polarity}`,
+            lat: `${element.lat}`,
+            lng: `${element.lng}`,
+            services : element.services,
+            owner: element.owner,
+            comments: element.comments,
+          },
+          geometry: element.geoLocation,
+        })
+      })
+      res.status(200).json(responseGeoJSON)
+    })
+    .catch(e => res.status(404).json({ error:'not found' }))
+})
+
+router.put('/favorite/:placeId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
   const { _id:id } = req.session.currentUser
   const { placeId } = req.params
 
-  console.log({ id })
-  console.log(placeId)
+  // console.log({ id })
+  // console.log(placeId)
 
   User.findByIdAndUpdate(id, { $push: { favorites: placeId } }, { new: true })
+    .populate('favorites')
+    .populate('comments')
+    .populate('following')
     .then((updatedUser) => {
       console.log(updatedUser)
       res.status(200).json({ updatedUser })
     })
     .catch(e => res.status(404).json({ error:'not found' }))
-}).delete('/favorite/:placeId([a-z,0-9]{24})', (req, res, next) => {
+}).delete('/favorite/:placeId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
   const { _id: id } = req.session.currentUser
   const { placeId } = req.params
 
   User.findByIdAndUpdate(id, { $pull: { favorites:placeId } }, { new: true })
+    .populate('favorites')
+    .populate('comments')
+    .populate('following')
     .then((updatedUser) => {
       console.log(updatedUser)
       res.status(200).json({ updatedUser })
     })
-    .catch(e => res.status(404).json({ error:'not found' }))
+    .catch(e => res.status(404).json({ error:e }))
 })
 
 // REVIEWS
@@ -116,6 +170,7 @@ router.post('/comment/:placeId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) =
       console.log(element._id)
       const comments = element._id
 
+      // TODO update list in USER model
       return Place.findByIdAndUpdate(id, { $push: { comments } }, { new:true }).populate('comments')
     })
     .then(element => res.status(200).json(element))

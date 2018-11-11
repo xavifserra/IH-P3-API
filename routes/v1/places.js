@@ -167,15 +167,15 @@ router.get('/around', isLoggedIn(), (req, res, next) => {
 })
 // not protected
 router.get('/aroundGeoJSON', (req, res, next) => {
-  const { lat, lng, dist } = req.query
+  const { lat, lng, dist, limit } = req.query
   // console.log(req.query)
   const centerPoint = { type: 'Point', coordinates:[lng, lat]  }
   // console.log(centerPoint)
   // Places.near({center: {coordinates: [latitude, longitude], type: 'Point'}, maxDistance: maxDistance})
 
   Places.find({ geoLocation:{ $near:{ $geometry: centerPoint, $maxDistance:dist } } })// , { geoLocation:1 })
-    .populate('comments')
-    .populate('owner')
+    // .populate('comments')
+    // .populate('owner')
     .find((error, response) => {
       const responseGeoJSON = {
         type:'FeatureCollection',
