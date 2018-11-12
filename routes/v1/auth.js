@@ -22,14 +22,14 @@ router.get('/me', (req, res, next) => {
 router.post('/login', (req, res, next) => {
   if (req.session.currentUser) {
     return res.status(401).json({
-      error: 'Unautorized. Session active, first logout',
+      error: 'Unautorized.\nSession active, first logout',
     })
   }
 
   const { username, password } = req.body
 
   if (!username || !password) {
-    return res.status(422).json({ error: 'validation' })
+    return res.status(422).json({ error: 'User and password are required' })
   }
   User.findOne({ username })
     .populate('favorites')
@@ -38,7 +38,7 @@ router.post('/login', (req, res, next) => {
     .then((user) => {
       console.log(user)
       if (!user) {
-        return res.status(404).json({ error: 'user not-found' })
+        return res.status(404).json({ error: 'user not found' })
       }
       return user.comparePasswords(password)
         .then((value) => {
@@ -46,7 +46,6 @@ router.post('/login', (req, res, next) => {
           req.session.currentUser = user
           return res.status(200).json(user)
         })
-        // .catch(e => res.status(404).json({ error: 'not-found' }))
     })
     .catch(next)
 })
@@ -59,9 +58,7 @@ router.post('/signup', (req, res, next) => {
     email,
   } = req.body
   if (!username || !password) {
-    return res.status(400).json({
-      error: 'empty',
-    })
+    return res.status(400).json({ error: 'empty' })
   }
 
   User.findOne({ username }, 'username')
@@ -69,7 +66,7 @@ router.post('/signup', (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((userExists) => {
       if (userExists) {
-        return res.status(400).json({ error: 'username-not-unique' })
+        return res.status(400).json({ error: 'username in use' })
       }
 
       // const salt = bcrypt.genSaltSync(10)

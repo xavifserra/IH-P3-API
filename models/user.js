@@ -8,11 +8,11 @@ const { Schema } = mongoose
 const { ObjectId }  = mongoose.SchemaTypes
 
 const UserSchema = new Schema({
+  name: String,
+  lastname: String,
   username: { type: String, trim: true, required: true, unique: true },
   password: { type: String, required: true },
   email: { type: String, unique: true, required: true },
-  name: String,
-  lastName: String,
   languages: {
     type: String,
     enum: ['en', 'it', 'fr', 'nl', 'de', 'es' ],

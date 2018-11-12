@@ -29,11 +29,13 @@ router.get('/', isLoggedIn(), (req, res, next) => {
     .populate('comments')
     .populate('following')
     .then((result) => {
+      // console.log(result)
+      result.name = name
+      result.lastname = lastname
       result.username = username
       result.password = password
       result.email = email
-      result.name = name
-      result.lastname = lastname
+
       return result.save()
     })
     .then((newUser) => {
@@ -45,11 +47,11 @@ router.get('/', isLoggedIn(), (req, res, next) => {
 }).delete('/', isLoggedIn(),  (req, res, next) => {
   const { _id : id } = req.session.currentUser
 
-  User.findByIdAndDelete(id)
-    .populate('favorites')
-    .populate('comments')
-    .populate('following')
-    .then(deletedUser => res.status(200).json({ deletedUser }))
+  return User.findByIdAndDelete(id)
+    .then((response) => {
+      console.log(response)
+      res.status(200).json({ result: 'Ok' })
+    })
     .catch(e => res.status(404).json({ error:'not found' }))
 })
 
