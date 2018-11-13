@@ -40,6 +40,7 @@ router.post('/login', (req, res, next) => {
       if (!user) {
         return res.status(404).json({ error: 'user not found' })
       }
+
       return user.comparePasswords(password)
         .then((value) => {
           console.log(value)
@@ -57,30 +58,37 @@ router.post('/signup', (req, res, next) => {
     password,
     email,
   } = req.body
-  if (!username || !password) {
-    return res.status(400).json({ error: 'empty' })
+  if (!username || !password || !email) {
+    return res.status(400).json({ error: 'all fields are required' })
   }
-
-  User.findOne({ username }, 'username')
-
-    // eslint-disable-next-line consistent-return
-    .then((userExists) => {
-      if (userExists) {
-        return res.status(400).json({ error: 'username in use' })
+  User.findOne({ email }, 'email')
+    .then((match) => {
+      if (match) {
+        return res.status(400).json({ error: 'email registered' })
       }
 
-      // const salt = bcrypt.genSaltSync(10)
-      // const hashPass = bcrypt.hashSync(password, salt)
-
-      User.create({
-        username,
-        password, // : hashPass,
-        email,
-      }).then((newUser) => {
-        console.log(newUser)
-        req.session.currentUser = newUser
-        return res.status(200).json(newUser)
-      }).catch(next)
+      return User.findOne({ username }, 'username')
+        .then((userExists) => {
+          if (userExists) {
+            return res.status(400).json({ error: 'username in use' })
+          }
+          // const salt = bcrypt.genSaltSync(10)
+          // const hashPass = bcrypt.hashSync(password, salt)
+          console.log({
+            username,
+            password, // : hashPass,
+            email,
+          })
+          return User.create({
+            username,
+            password, // : hashPass,
+            email,
+          }).then((newUser) => {
+            console.log(newUser)
+            req.session.currentUser = newUser
+            return res.status(200).json(newUser)
+          }).catch(next)
+        })
     })
     .catch(next)
 })

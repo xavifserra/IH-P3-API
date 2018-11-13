@@ -5,7 +5,7 @@ const { Schema } = mongoose
 const { ObjectId } = mongoose.SchemaTypes
 
 const placeSchema = new Schema({
-  id: { type: Number, unique: true },
+  // id: { type: Number, unique: true },
   name: String,
   address: String,
   category: String,

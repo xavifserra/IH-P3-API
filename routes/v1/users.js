@@ -109,9 +109,9 @@ router.put('/favorite/:placeId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) =
     .populate('favorites')
     .populate('comments')
     .populate('following')
-    .then((updatedUser) => {
-      console.log(updatedUser)
-      res.status(200).json({ updatedUser })
+    .then((user) => {
+      console.log(user)
+      return res.status(200).json(user)
     })
     .catch(e => res.status(404).json({ error:'not found' }))
 }).delete('/favorite/:placeId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
@@ -122,9 +122,9 @@ router.put('/favorite/:placeId([a-z,0-9]{24})', isLoggedIn(), (req, res, next) =
     .populate('favorites')
     .populate('comments')
     .populate('following')
-    .then((updatedUser) => {
-      console.log(updatedUser)
-      res.status(200).json({ updatedUser })
+    .then((user) => {
+      console.log(user)
+      return res.status(200).json(user)
     })
     .catch(e => res.status(404).json({ error:e }))
 })
