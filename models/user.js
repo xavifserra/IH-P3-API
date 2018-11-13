@@ -12,7 +12,7 @@ const UserSchema = new Schema({
   password: { type: String, required: true },
   email: { type: String, unique: true, required: true },
   name: String,
-  lastName: String,
+  lastname: String,
   languages: {
     type: String,
     enum: ['en', 'it', 'fr', 'nl', 'de', 'es' ],
