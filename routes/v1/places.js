@@ -115,6 +115,7 @@ router.put('/', isLoggedIn(), (req, res, next) => {
         element.location = location
         element.lat = lat
         element.lng = lng
+        element.owner = req.session.currentUser._id
         geoLocation = {
           type : 'Point',
           coordinates : [lng, lat],
