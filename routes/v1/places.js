@@ -76,11 +76,11 @@ router.put('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
     lng,
     services,
   } = req.body
-  console.log(req.body)
+  console.log('peticion', req.body)
 
   Places.findById(id)
     .then((element) => {
-      // console.log({ element })
+      console.log(element)
       if (element) {
         element.name = name
         element.address = address
@@ -94,11 +94,11 @@ router.put('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
           coordinates : [lng, lat],
         }
         element.services = services
-        element.save()
+        return element.save()
       }
     })// .populate('comments')
     .then((updatedElement) => {
-      console.log(updatedElement)
+      console.log({ updatedElement })
       res.status(200).json(updatedElement)
     })
     .catch((error) => {
