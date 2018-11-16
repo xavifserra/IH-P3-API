@@ -35,84 +35,57 @@ router.get('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
 // CRUD Create  isLoggedIn(),
 router.post('/', (req, res, next) => {
   const {
-    id,
     name,
     address,
-    category,
-    location,
     lat,
     lng,
-    airConditioned,
-    fidelityCard,
-    ticketRestaurant,
-    chequeGourmet,
-    wifi,
-    movileCoverage,
-    pets,
-    adapted,
+    services,
   } = req.body
 
-  Places.create({
-    id,
-    name,
-    address,
-    category,
-    location,
-    lat:parseFloat(lat),
-    lng:parseFloat(lng),
-    geoLocation:{
-      type : 'Point',
-      coordinates : [lng, lat],
-    },
-    services: {
-      airConditioned,
-      fidelityCard,
-      ticketRestaurant,
-      chequeGourmet,
-      wifi,
-      movileCoverage,
-      pets,
-      adapted,
-    },
+  Places.create(
+    {
+      services,
+      owner:req.session.currentUser._id,
+      name,
+      address,
+      category:'Restaurant',
+      location:'Barcelona',
+      lat,
+      lng,
+      geoLocation:{
+        type : 'Point',
+        coordinates : [lng, lat],
+      },
+    } // ,(error, success )=>{console.log('error',error), console.log('success',success);}
+  ).then((element) => {
+    console.log('-------->', element)
+    res.status(200).json(element)
+  }).catch((error) => {
+    res.status(500).json({ error })
   })
-    .then((element) => {
-      res.status(200).json(element)
-    })
-    .catch((error) => {
-      res.status(500).json({ error })
-    })
 })
 
 // CRUD Update
-router.put('/', isLoggedIn(), (req, res, next) => {
+router.put('/:id([a-z,0-9]{24})', isLoggedIn(), (req, res, next) => {
+  const { id } = req.params
   const {
     _id,
-    id,
     name,
     address,
-    category,
-    location,
     lat,
     lng,
-    airConditioned,
-    fidelityCard,
-    ticketRestaurant,
-    chequeGourmet,
-    wifi,
-    movileCoverage,
-    pets,
-    adapted,
+    services,
   } = req.body
+  console.log(req.body)
 
-  Places.findById({ _id })
+  Places.findById(id)
     .then((element) => {
-      // console.log(element)
+      // console.log({ element })
       if (element) {
-        element.id = id
         element.name = name
         element.address = address
-        element.category = category
-        element.location = location
+        element.category = 'Restaurant'
+        element.location = 'Barcelona'
         element.lat = lat
         element.lng = lng
         element.owner = req.session.currentUser._id
@@ -120,21 +93,12 @@ router.put('/', isLoggedIn(), (req, res, next) => {
           type : 'Point',
           coordinates : [lng, lat],
         }
-        element.services = {
-          airConditioned,
-          fidelityCard,
-          ticketRestaurant,
-          chequeGourmet,
-          wifi,
-          movileCoverage,
-          pets,
-          adapted,
-        }
+        element.services = services
         element.save()
       }
-    }).populate('comments')
+    })// .populate('comments')
     .then((updatedElement) => {
-      // console.log(updatedElement)
+      console.log(updatedElement)
       res.status(200).json(updatedElement)
     })
     .catch((error) => {
@@ -177,6 +141,7 @@ router.get('/aroundGeoJSON', (req, res, next) => {
   Places.find({ geoLocation:{ $near:{ $geometry: centerPoint, $maxDistance:dist } } })// , { geoLocation:1 })
     // .populate('comments')
     // .populate('owner')
+    .limit(limit)
     .find((error, response) => {
       const responseGeoJSON = {
         type:'FeatureCollection',
@@ -191,7 +156,7 @@ router.get('/aroundGeoJSON', (req, res, next) => {
           properties:{
             _id: element._id,
             id: element.id,
-            place: element.name,
+            name: element.name,
             address: element.address,
             category: element.category,
             location: element.location,
